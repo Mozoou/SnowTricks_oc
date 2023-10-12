@@ -6,6 +6,7 @@ use App\Entity\Category;
 use App\Entity\Trick;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -18,8 +19,8 @@ class TrickType extends AbstractType
     {
         $builder
             ->add('category', EntityType::class, [
-            'class' => Category::class,
-            'label' => 'Catégorie'
+                'class' => Category::class,
+                'label' => 'Catégorie'
             ])
             ->add('name', TextType::class, [
                 'label' => 'Nom',
@@ -31,6 +32,13 @@ class TrickType extends AbstractType
                 'label' => 'Images',
                 'mapped' => false,
                 'multiple' => true,
+            ])
+            ->add('videos', CollectionType::class, [
+                'label' => 'Videos',
+                'entry_type' => VideoType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
             ])
         ;
     }

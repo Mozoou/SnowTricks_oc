@@ -3,7 +3,7 @@
 {% block title %}Acceuil | SnowTricks{% endblock %}
 
 {% block body %}
-<section class="bg-hoverboard py-5 mx-0 text-center container d-flex align-items-center">
+<section class="bg-hoverboard py-5 mx-0 text-center container d-flex align-items-center justify-content-center">
     <div class="row py-lg-5">
         <div class="col-lg-6 col-md-8 mx-auto">
             <h1 class="text-light">Album example</h1>
@@ -22,7 +22,7 @@
 <main>
     <div class="album py-5 bg-light" id="tricks">
         <div class="container">
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-5">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-5">
                 {% for trick in tricks %}
                 <div class="col">
                     <div class="card shadow-sm">
@@ -34,29 +34,24 @@
                         {% endif %}
                         <div class="card-body">
                             <p class="card-text">
-                                {{ trick.name|capitalize }}
                             </p>
                             <div class="d-flex justify-content-between">
                                 <div class="btn-group">
-                                    <a href="{{ path('app_trick_show', {'id': trick.id}) }}" class="btn btn-sm btn-outline-success">
-                                        Voir
+                                    <a href="{{ path('app_trick_show', {'slug': trick.slug}) }}">
+                                        {{ trick.name|capitalize }}
                                     </a>
-                                    {% if app.user == trick.author %}
+                                </div>
+                                {% if app.user == trick.author %}
+                                    <div class="float-end">
                                         <a href="{{ path('app_trick_edit', {'id': trick.id}) }}" class="btn btn-sm btn-outline-secondary">
-                                            Modifier
+                                            <i class="fa fa-edit"></i>
                                         </a>
                                         <a href="{{ path('app_trick_delete', {'id': trick.id}) }}" class="btn btn-sm btn-outline-danger">
-                                            Supprimer
+                                            <i class="fa fa-trash"></i>
                                         </a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <small class="text-muted">
-                                Créer le : <br> {{ trick.createdAt|date("d/m/Y") }} <br>
-                                {% if trick.createdAt != trick.updatedAt %}
-                                    Dernière modification :  <br> {{ trick.updatedAt|date("d/m/Y H:i:s") }}
+                                    </div>
                                 {% endif %}
-                            </small>
+                            </div>
                         </div>
                     </div>
                 </div>

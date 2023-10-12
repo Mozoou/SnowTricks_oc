@@ -6,6 +6,7 @@ use App\Entity\Image;
 use App\Entity\Trick;
 use App\Form\TrickType;
 use App\Service\ImageUploader;
+use App\Service\SlugGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class TrickController extends AbstractController
 {
     #[Route('/new', name: 'app_trick_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, ImageUploader $imageUploader): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, ImageUploader $imageUploader, SlugGenerator $slugGenerator): Response
     {
         $trick = new Trick();
         $form = $this->createForm(TrickType::class, $trick);
@@ -28,9 +29,11 @@ class TrickController extends AbstractController
                 $imageName = $imageUploader->upload($imageName);
                 $image = New Image;
                 $image->setName($imageName);
+                $image->setIsPrimary(false);
                 $trick->addImage($image);
             }
             $trick->setAuthor($this->getUser());
+            $trick->setSlug($slugGenerator->generateSlug($trick->getName()));
             $entityManager->persist($trick);
             
             $entityManager->flush();
@@ -44,7 +47,7 @@ class TrickController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_trick_show', methods: ['GET'])]
+    #[Route('/{slug}', name: 'app_trick_show', methods: ['GET'])]
     public function show(Trick $trick): Response
     {
         return $this->render('trick/show.html.twig', [

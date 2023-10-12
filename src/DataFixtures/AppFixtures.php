@@ -5,14 +5,17 @@ namespace App\DataFixtures;
 use App\Entity\Category;
 use App\Entity\Trick;
 use App\Entity\User;
+use App\Service\SlugGenerator;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
-    public function __construct(private UserPasswordHasherInterface $userPasswordHasherInterface)
-    {
+    public function __construct(
+        private UserPasswordHasherInterface $userPasswordHasherInterface,
+        private SlugGenerator $slugGenerator,
+    ) {
     }
 
     public function load(ObjectManager $manager): void
@@ -55,19 +58,20 @@ class AppFixtures extends Fixture
         ];
 
         $categories = [];
-        for ($i = 0; $i < 3; $i++) { 
+        for ($i = 0; $i < 3; $i++) {
             $categorie = new Category;
-            $categorie->setName('Categorie '.$i);
+            $categorie->setName('Categorie ' . $i);
             $categories[] = $categorie;
 
             $manager->persist($categorie);
         }
 
-        foreach ($tricks as $name => $description) { 
+        foreach ($tricks as $name => $description) {
             $trick = new Trick;
             $trick->setName($name);
+            $trick->setSlug($this->slugGenerator->generateSlug($name));
             $trick->setDescription($description);
-            $trick->setCategory($categories[rand(0,2)]);
+            $trick->setCategory($categories[rand(0, 2)]);
             $trick->setCreatedAt(new \DateTimeImmutable());
             $trick->setUpdatedAt(new \DateTimeImmutable());
             $trick->setAuthor($users[rand(0, 3)]);

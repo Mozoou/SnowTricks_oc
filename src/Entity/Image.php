@@ -19,6 +19,9 @@ class Image
     #[ORM\ManyToOne(inversedBy: 'images')]
     private ?Trick $trick = null;
 
+    #[ORM\Column]
+    private ?bool $is_primary = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,6 +47,18 @@ class Image
     public function setTrick(?Trick $trick): static
     {
         $this->trick = $trick;
+
+        return $this;
+    }
+
+    public function isIsPrimary(): ?bool
+    {
+        return $this->is_primary;
+    }
+
+    public function setIsPrimary(bool $is_primary): static
+    {
+        $this->is_primary = $is_primary;
 
         return $this;
     }
