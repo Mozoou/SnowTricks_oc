@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Category;
+use App\Entity\Image;
 use App\Entity\Trick;
 use App\Entity\User;
 use App\Service\SlugGenerator;
@@ -76,6 +77,11 @@ class AppFixtures extends Fixture
             $trick->setUpdatedAt(new \DateTimeImmutable());
             $trick->setAuthor($users[rand(0, 3)]);
 
+            $image = new Image;
+            $image->setName('default.jpg');
+            $manager->persist($image);
+
+            $trick->setPrimaryImage($image);
             $manager->persist($trick);
         }
 

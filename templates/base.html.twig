@@ -7,11 +7,35 @@
     <meta name="description" content="" />
     <title>{% block title %}{% endblock %}</title>
     {% block stylesheets %}
+      <style>
+        .thumbnail {
+              width: 164px;
+              height: 164px;
+              overflow: hidden;
+              margin: auto;
+        }
+        .thumbnail img {
+            width: 164px;
+            height: 100%;
+            object-fit: cover;
+        }
+      </style>
         {{ encore_entry_link_tags('app') }}
     {% endblock %}
 
     {% block javascripts %}
-      {{ encore_entry_script_tags('app') }}
+        {% for key in app.request.query|keys %}
+          {% if key == 'tricks' %}
+            <script>
+              window.addEventListener('load', function(event) {
+                document.getElementById('tricks').scrollIntoView();
+              }); 
+            </script>
+          {% endif %}
+        {% endfor %}
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" ></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
+        {{ encore_entry_script_tags('app') }}
     {% endblock %}
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/album/" />
@@ -53,6 +77,12 @@
                             <a class="nav-link" href="/">Home</a>
                           </li>
                           <li class="nav-item">
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                              <li><a class="dropdown-item" href="#">Action</a></li>
+                              <li><a class="dropdown-item" href="#">Another action</a></li>
+                              <li><hr class="dropdown-divider"></li>
+                              <li><a class="dropdown-item" href="#">Something else here</a></li>
+                            </ul>
                             <a class="nav-link" href="#tricks">Tricks</a>
                           </li>
                           {% if app.user %}
@@ -72,7 +102,7 @@
                     </div>
                   </nav>
             </div>
-            <div class="navbar navbar-dark bg-dark shadow-sm">
+            <div class="navbar navbar-light bg-warning shadow-sm border-bottom border-dark border-5">
                 <div class="container">
                     <a href="/" class="navbar-brand d-flex align-items-center">
                         <strong>SnowTricks</strong>
@@ -86,21 +116,27 @@
                           <div class="collapse navbar-collapse" id="navbarNav">
                             <ul class="navbar-nav">
                                 <li class="nav-item">
-                                  <a class="nav-link" href="/">Home</a>
+                                  <a class="nav-link" href="/">Acceuil</a>
                                 </li>
-                                <li class="nav-item">
-                                  <a class="nav-link" href="#tricks">Tricks</a>
+                                <li class="nav-item dropdown">
+                                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Figures
+                                  </a>
+                                  <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <li><a class="dropdown-item" href="{{ path('app_home', {tricks: ''}) }}">Toutes les figures</a></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_trick_new') }}">Nouveau</a></li>
+                                  </ul>
                                 </li>
                                 {% if app.user %}
                                   <li class="nav-item">
-                                      <a class="nav-link" href="{{ path("app_logout") }}">Sign out</a>
+                                      <a class="nav-link" href="{{ path("app_logout") }}">Déconnexion</a>
                                   </li>
                                 {% else %}
                                   <li class="nav-item">
-                                      <a class="nav-link" href="{{ path("app_login") }}">Sing in</a>
+                                      <a class="nav-link" href="{{ path("app_login") }}">Connexion</a>
                                   </li>
                                   <li class="nav-item">
-                                      <a class="nav-link" href="{{ path("app_register") }}">Sing up</a>
+                                      <a class="nav-link" href="{{ path("app_register") }}">Inscription</a>
                                   </li>
                                 {% endif %}
                             </ul>
@@ -110,10 +146,10 @@
                 </div>
             </div>
         </header>
+
     {% endblock %}
 
     {% block body %}
-        
     {% endblock %}
 
     {% block footer %}
@@ -135,9 +171,7 @@
     {% endblock %}
 
     {% block body_js %}
-      <script src="https://getbootstrap.com/docs/5.0/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-      crossorigin="anonymous"></script>
+      
     {% endblock %}
 </body>
 

@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\Image;
 use App\Entity\Trick;
+use App\Form\CommentType;
 use App\Form\TrickType;
 use App\Service\ImageUploader;
 use App\Service\SlugGenerator;
@@ -27,15 +29,14 @@ class TrickController extends AbstractController
             $imagesNames = $form->get('images')->getData();
             foreach ($imagesNames as $imageName) {
                 $imageName = $imageUploader->upload($imageName);
-                $image = New Image;
+                $image = new Image;
                 $image->setName($imageName);
-                $image->setIsPrimary(false);
                 $trick->addImage($image);
             }
             $trick->setAuthor($this->getUser());
             $trick->setSlug($slugGenerator->generateSlug($trick->getName()));
             $entityManager->persist($trick);
-            
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
@@ -47,11 +48,36 @@ class TrickController extends AbstractController
         ]);
     }
 
-    #[Route('/{slug}', name: 'app_trick_show', methods: ['GET'])]
-    public function show(Trick $trick): Response
+    #[Route('/{slug}', name: 'app_trick_show', methods: ['GET', 'POST'])]
+    public function show(Trick $trick, Request $request, EntityManagerInterface $entityManager): Response
     {
+        $form = $this->createForm(CommentType::class);
+
+        if ($request->isMethod('POST')) {
+            $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+
+            $comment = new Comment();
+            $form = $this->createForm(CommentType::class, $comment);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $comment->setAuthor($this->getUser());
+                $comment->setTrick($trick);
+
+                try {
+                    $entityManager->persist($comment);
+                    $entityManager->flush();
+                    $this->addFlash('success', 'Le commentaire a bien été ajouté !');
+                } catch (\Throwable $th) {
+                    $this->addFlash('danger', 'Le commentaire n\'a pas pu être ajouté :( ');
+                }
+            }
+
+        }
+
         return $this->render('trick/show.html.twig', [
             'trick' => $trick,
+            'form' => $form,
         ]);
     }
 
@@ -73,14 +99,20 @@ class TrickController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_trick_delete', methods: ['POST'])]
+    #[Route('/delete/{id}', name: 'app_trick_delete', methods: ['POST'])]
     public function delete(Request $request, Trick $trick, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$trick->getId(), $request->request->get('_token'))) {
+        dd($trick);
+        if ($this->isCsrfTokenValid('delete' . $trick->getId(), $request->request->get('_token'))) {
             $entityManager->remove($trick);
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/add-comment/{id}', name: 'app_trick_add_comment', methods: ['POST'])]
+    public function postComment(Trick $trick, Request $request, EntityManagerInterface $entityManager)
+    {
     }
 }

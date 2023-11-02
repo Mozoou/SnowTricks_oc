@@ -3,6 +3,7 @@
 {% block title %}Acceuil | SnowTricks{% endblock %}
 
 {% block body %}
+
 <section class="bg-hoverboard py-5 mx-0 text-center container d-flex align-items-center justify-content-center">
     <div class="row py-lg-5">
         <div class="col-lg-6 col-md-8 mx-auto">
@@ -22,27 +23,24 @@
 <main>
     <div class="album py-5 bg-light" id="tricks">
         <div class="container">
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-5">
+            <div id="item-list" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-5">
                 {% for trick in tricks %}
                 <div class="col">
                     <div class="card shadow-sm">
-                        {% set image =  trick.images|first %}
-                        {% if image != false and image_exists(asset(image.name)) %}
-                            <img src="{{ asset('/uploads/images/'~ image.name) }}" alt="">
+                        {% if trick.primaryImage != false and image_exists(asset(trick.primaryImage.name)) %}
+                            <img class="card-img-top thumbnail" src="{{ asset('/uploads/images/'~ trick.primaryImage.name) }}" height="200" alt="">
                         {% else %}
-                            <img src="{{ asset('/uploads/images/default.jpg') }}" alt="">
+                            <img class="card-img-top thumbnail" src="{{ asset('/uploads/images/default.jpg') }}" height="200" alt="">
                         {% endif %}
                         <div class="card-body">
                             <p class="card-text">
+                                <a href="{{ path('app_trick_show', {'slug': trick.slug}) }}">
+                                    {{ trick.name|capitalize }}
+                                </a>
                             </p>
                             <div class="d-flex justify-content-between">
-                                <div class="btn-group">
-                                    <a href="{{ path('app_trick_show', {'slug': trick.slug}) }}">
-                                        {{ trick.name|capitalize }}
-                                    </a>
-                                </div>
                                 {% if app.user == trick.author %}
-                                    <div class="float-end">
+                                    <div class="">
                                         <a href="{{ path('app_trick_edit', {'id': trick.id}) }}" class="btn btn-sm btn-outline-secondary">
                                             <i class="fa fa-edit"></i>
                                         </a>
@@ -57,24 +55,50 @@
                 </div>
                 {% endfor %}
             </div>
-            {% if totalPages > 1 %}
-                <nav class="my-4" aria-label="Page navigation">
-                    <ul class="pagination">
-                        <li class="page-item"><a class="page-link" href="{{ path('app_home', {'page': 1}) }}">First</a></li>
-                        <li class="page-item"><a class="page-link" href="{{ path('app_home', {'page': page - 1}) }}">Previous</a></li>
-                        {% for i in 1..totalPages %}
-                            {% set active = false %}
-                            {% if i == page %}
-                                {% set active = 'active' %}
-                            {% endif %}
-                            <li class="page-item {{ active }}"><a class="page-link" href="{{ path('app_home', {'page': i}) }}">{{ i }}</a></li>
-                        {% endfor %}
-                        <li class="page-item"><a class="page-link" href="{{ path('app_home', {'page': page + 1}) }}">Next</a></li>
-                        <li class="page-item"><a class="page-link" href="{{ path('app_home', {'page': totalPages}) }}">Last</a></li>
-                    </ul>
-                </nav>
-            {% endif %}
+            <div class="d-grid my-4 px-5">
+                <button id="load-more-btn" class="btn btn-primary">Voir plus</button>
+              </div>
         </div>
     </div>
 </main>
+
+{% block body_js %}
+    {{ parent() }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const itemList = document.getElementById("item-list");
+          const loadMoreBtn = document.getElementById("load-more-btn");
+          const itemsPerPage = 5;
+          let visibleItems = itemsPerPage;
+    
+          // Function to show the next batch of items
+          function loadMoreItems() {
+            for (let i = visibleItems; i < visibleItems + itemsPerPage; i++) {
+              const item = itemList.querySelector(`div:nth-child(${i + 1})`);
+              if (item) {
+                item.style.display = "block";
+              }
+            }
+    
+            visibleItems += itemsPerPage;
+    
+            // Hide the "Load More" button if there are no more items to load
+            if (visibleItems >= itemList.children.length) {
+              loadMoreBtn.style.display = "none";
+            }
+          }
+    
+          // Initially hide all items except the first batch
+          for (let i = itemsPerPage; i < itemList.children.length; i++) {
+            const item = itemList.querySelector(`div:nth-child(${i + 1})`);
+            if (item) {
+              item.style.display = "none";
+            }
+          }
+    
+          // Attach the loadMoreItems function to the button click event
+          loadMoreBtn.addEventListener("click", loadMoreItems);
+        });
+    </script>
+{% endblock %}
 {% endblock %}
