@@ -1,0 +1,10 @@
+{{ form_errors(form) }}
+
+{{ form_start(form) }}
+    {{ form_row(form.email) }}
+    {{ form_row(form.username) }}
+    {{ form_row(form.image) }}
+    {{ form_row(form.plainPassword) }}
+
+    <button type="submit" class="btn btn-primary">Mettre à jour mon profil</button>
+{{ form_end(form) }}
