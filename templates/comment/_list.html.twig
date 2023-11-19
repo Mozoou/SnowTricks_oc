@@ -3,11 +3,11 @@
     <div id="comment-list" class="col-md-11 col-lg-9 col-xl-7">
       {% for comment in trick.comments %}
         <div class="d-flex flex-start mb-4">
-          <img class="rounded-circle shadow-1-strong me-3" src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(32).webp" alt="avatar" width="65" height="65" />
+          <img class="rounded-circle shadow-1-strong me-3" src="{{ asset('/uploads/images/' ~ comment.author.image.name) }}" alt="avatar" width="65" height="65" />
           <div class="w-100">
             <div class="card-body p-4">
               <div class="">
-                <h5>{{ comment.author }}</h5>
+                <h5>@{{ comment.author }}</h5>
                 <p class="small">{{ comment.createdAt|date("d/m/Y H:i:s") }}</p>
                 <p>
                   {{ comment.content }}
@@ -15,6 +15,10 @@
               </div>
             </div>
           </div>
+        </div>
+      {% else %}
+        <div class="text-center">
+          Aucun commentaire pour le moment
         </div>
       {% endfor %}
     </div>
@@ -24,14 +28,15 @@
 
 {% block js_body %}
   <script>
-    // JavaScript code
     document.addEventListener("DOMContentLoaded", function () {
       const itemList = document.getElementById("comment-list");
       const loadMoreBtn = document.getElementById("load-more-btn");
       const itemsPerPage = 5;
       let visibleItems = itemsPerPage;
+      if (visibleItems >= itemList.children.length) {
+        loadMoreBtn.style.display = "none";
+      }
 
-      // Function to show the next batch of items
       function loadMoreItems() {
         for (let i = visibleItems; i < visibleItems + itemsPerPage; i++) {
           const item = itemList.querySelector(`div:nth-child(${i + 1})`);
@@ -42,13 +47,12 @@
 
         visibleItems += itemsPerPage;
 
-        // Hide the "Load More" button if there are no more items to load
+        console.log(itemList.children.length);
         if (visibleItems >= itemList.children.length) {
           loadMoreBtn.style.display = "none";
         }
       }
 
-      // Initially hide all items except the first batch
       for (let i = itemsPerPage; i < itemList.children.length; i++) {
         const item = itemList.querySelector(`div:nth-child(${i + 1})`);
         if (item) {
@@ -56,7 +60,6 @@
         }
       }
 
-      // Attach the loadMoreItems function to the button click event
       loadMoreBtn.addEventListener("click", loadMoreItems);
     });
   </script>

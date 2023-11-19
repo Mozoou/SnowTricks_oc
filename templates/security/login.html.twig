@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in | SnowTricks{% endblock %}
+{% block title %}Connexion | SnowTricks{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
+<div class="container mt-5 border border-3 p-5">
     <form method="post">
     {% if error %}
         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -15,19 +15,25 @@
         </div>
     {% endif %}
 
-    <h1 class="h3 mb-3 font-weight-normal">Log in</h1>
-    <label for="inputEmail">Email</label>
-    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-    <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+    <h1 class="h3 mb-3 font-weight-normal text-center">Connexion</h1>
+    <div class="my-3">
+        <label for="inputEmail">Email</label>
+        <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+    </div>
+    <div class="my-3">
+        <label for="inputPassword">Mot de passe</label>
+        <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+    </div>
+    
 
-    <input type="hidden" name="_csrf_token"
-           value="{{ csrf_token('authenticate') }}"
-    >
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+    <div class="text-center">
+        <a href="{{ path('app_forgot_password_request') }}" class="text-center">Mot de passe oublié ?</a>
+    </div>
+    <div class="d-grid gap-2">
+        <button class="btn btn-lg btn-primary mt-3" type="submit">Connexion</button>
+    </div>
 
-    <button class="btn btn-lg btn-primary mt-3" type="submit">
-        Sign in
-    </button>
 </form>
 </div>
 {% endblock %}

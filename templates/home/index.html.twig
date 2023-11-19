@@ -4,20 +4,27 @@
 
 {% block body %}
 
-<section class="bg-hoverboard py-5 mx-0 text-center container d-flex align-items-center justify-content-center">
-    <div class="row py-lg-5">
-        <div class="col-lg-6 col-md-8 mx-auto">
-            <h1 class="text-light">Album example</h1>
-            <p class="lead text-light">
-                Something short and leading about the collection below—its
-                contents, the creator, etc. Make it short and sweet, but not too
-                short so folks don't simply skip over it entirely.
-            </p>
-            <p>
-                <a href="#" class="btn btn-primary my-2">Main call to action</a>
-                <a href="#" class="btn btn-secondary my-2">Secondary action</a>
-            </p>
+<section class="bg-hoverboard position-relative">
+    <div class="text-center container d-flex align-items-center justify-content-center">
+        <div class="row py-lg-5">
+            <div class="col-lg-6 col-md-8 mx-auto">
+                <h1 class="text-light">Album example</h1>
+                <p class="lead text-light">
+                    Something short and leading about the collection below—its
+                    contents, the creator, etc. Make it short and sweet, but not too
+                    short so folks don't simply skip over it entirely.
+                </p>
+                <p>
+                    <a href="#" class="btn btn-primary my-2">Main call to action</a>
+                    <a href="#" class="btn btn-secondary my-2">Secondary action</a>
+                </p>
+            </div>
         </div>
+    </div>
+    <div class="align-self-end position-absolute" style="bottom: 50px; right:40px">
+        <a href="#tricks">
+            <i class="fa-regular fa-circle-down fa-2xl" style="font-size: 4em; color: #ffc107"></i>
+        </a>
     </div>
 </section>
 <main>
@@ -25,12 +32,12 @@
         <div class="container">
             <div id="item-list" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-5">
                 {% for trick in tricks %}
-                <div class="col">
+                <div class="col overflow-hidden">
                     <div class="card shadow-sm">
                         {% if trick.primaryImage != false and image_exists(asset(trick.primaryImage.name)) %}
-                            <img class="card-img-top thumbnail" src="{{ asset('/uploads/images/'~ trick.primaryImage.name) }}" height="200" alt="">
+                            <img class="card-img-top thumbnail" src="{{ asset('/uploads/images/'~ trick.primaryImage.name) }}" alt="">
                         {% else %}
-                            <img class="card-img-top thumbnail" src="{{ asset('/uploads/images/default.jpg') }}" height="200" alt="">
+                            <img class="card-img-top thumbnail" src="{{ asset('/uploads/images/default.jpg') }}" alt="">
                         {% endif %}
                         <div class="card-body">
                             <p class="card-text">
@@ -44,9 +51,7 @@
                                         <a href="{{ path('app_trick_edit', {'id': trick.id}) }}" class="btn btn-sm btn-outline-secondary">
                                             <i class="fa fa-edit"></i>
                                         </a>
-                                        <a href="{{ path('app_trick_delete', {'id': trick.id}) }}" class="btn btn-sm btn-outline-danger">
-                                            <i class="fa fa-trash"></i>
-                                        </a>
+                                        {{ include('trick/_delete_form.html.twig') }}
                                     </div>
                                 {% endif %}
                             </div>
@@ -68,8 +73,11 @@
         document.addEventListener("DOMContentLoaded", function () {
           const itemList = document.getElementById("item-list");
           const loadMoreBtn = document.getElementById("load-more-btn");
-          const itemsPerPage = 5;
+          const itemsPerPage = 12;
           let visibleItems = itemsPerPage;
+          if (visibleItems >= itemList.children.length) {
+            loadMoreBtn.style.display = "none";
+          }
     
           // Function to show the next batch of items
           function loadMoreItems() {
