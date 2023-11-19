@@ -12,6 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 class TrickType extends AbstractType
 {
@@ -19,7 +21,12 @@ class TrickType extends AbstractType
     {
         $builder
             ->add('primary_image', FileType::class, [
-                'label' => 'Image principale'
+                'mapped' => false,
+                'required' => false,
+                'label' => 'Image principale',
+                'constraints' => [
+                    new Assert\Image(maxSize: '3M')
+                ],
             ])
             ->add('category', EntityType::class, [
                 'class' => Category::class,
@@ -33,6 +40,7 @@ class TrickType extends AbstractType
             ])
             ->add('images', CollectionType::class, [
                 'label' => 'Image',
+                'mapped' => false,
                 'entry_type' => ImageType::class,
                 'allow_add' => true,
                 'allow_delete' => true,

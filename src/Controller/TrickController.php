@@ -2,18 +2,21 @@
 
 namespace App\Controller;
 
-use App\Entity\Comment;
 use App\Entity\Image;
 use App\Entity\Trick;
-use App\Form\CommentType;
+use App\Entity\Comment;
+use App\Entity\Video;
 use App\Form\TrickType;
+use App\Form\CommentType;
 use App\Service\ImageUploader;
 use App\Service\SlugGenerator;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route('/trick')]
 class TrickController extends AbstractController
@@ -26,19 +29,39 @@ class TrickController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $imagesNames = $form->get('images')->getData();
-            foreach ($imagesNames as $imageName) {
-                $imageName = $imageUploader->upload($imageName);
-                $image = new Image;
+            /** @var UploadedFile $primaryImageData */
+            $primaryImageData = $form->get('primary_image')->getData();
+            $primaryImage = new Image();
+            $imageName = $imageUploader->upload($primaryImageData);
+            $primaryImage->setName($imageName);
+            $trick->setPrimaryImage($primaryImage);
+            $entityManager->persist($primaryImage);
+
+            $parentImagesForm = $form->get('images');
+
+            foreach ($parentImagesForm as $imageForm) {
+                $image = $imageForm->getData();
+                $imageData = $imageForm->get('name')->getData();
+                $imageName = $imageUploader->upload($imageData);
                 $image->setName($imageName);
                 $trick->addImage($image);
+                $entityManager->persist($image);
             }
+
+            $videoNames = $form->get('videos')->getData();
+            foreach ($videoNames as $videoName) {
+                $video = new Video;
+                $video->setLink($videoName);
+                $trick->addVideo($video);
+                $entityManager->persist($video);
+            }
+
             $trick->setAuthor($this->getUser());
             $trick->setSlug($slugGenerator->generateSlug($trick->getName()));
             $entityManager->persist($trick);
 
             $entityManager->flush();
-
+            $this->addFlash('success', 'Le figure a bien été ajoutée !');
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -72,7 +95,6 @@ class TrickController extends AbstractController
                     $this->addFlash('danger', 'Le commentaire n\'a pas pu être ajouté :( ');
                 }
             }
-
         }
 
         return $this->render('trick/show.html.twig', [
@@ -82,13 +104,44 @@ class TrickController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_trick_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Trick $trick, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Trick $trick, EntityManagerInterface $entityManager, ImageUploader $imageUploader): Response
     {
         $form = $this->createForm(TrickType::class, $trick);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $primaryImageData */
+            $primaryImageData = $form->get('primary_image')->getData();
+            if ($primaryImageData) {
+                $primaryImage = $trick->getPrimaryImage();
+                $imageName = $imageUploader->upload($primaryImageData);
+                $primaryImage->setName($imageName);
+                $trick->setPrimaryImage($primaryImage);
+            }
+
+            $parentImagesForm = $form->get('images');
+            foreach ($parentImagesForm as $imageForm) {
+                $image = $imageForm->getData();
+                $imageData = $imageForm->get('name')->getData();
+                $imageName = $imageUploader->upload($imageData);
+                $image->setName($imageName);
+                $trick->addImage($image);
+                $entityManager->persist($image);
+            }
+
+            $videoNames = $form->get('videos')->getData();
+            foreach ($videoNames as $videoName) {
+                $video = new Video;
+                $video->setLink($videoName);
+                $trick->addVideo($video);
+                $entityManager->persist($video);
+            }
+
             $entityManager->flush();
+            $this->addFlash('success', sprintf(
+                'La figure %s a bien été modifiée',
+                $trick->getName(),
+            ));
 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
@@ -99,20 +152,30 @@ class TrickController extends AbstractController
         ]);
     }
 
+    #[Route('/delete/image/{id}', name: 'app_trick_delete_image')]
+    public function removeImage(Image $image, EntityManagerInterface $entityManager): JsonResponse
+    {
+        try {
+            $entityManager->remove($image);
+            $entityManager->flush();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+        return $this->json([
+             'success' => true,
+        ]);
+                    
+    }
+
     #[Route('/delete/{id}', name: 'app_trick_delete', methods: ['POST'])]
     public function delete(Request $request, Trick $trick, EntityManagerInterface $entityManager): Response
     {
-        dd($trick);
         if ($this->isCsrfTokenValid('delete' . $trick->getId(), $request->request->get('_token'))) {
             $entityManager->remove($trick);
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
-    }
-
-    #[Route('/add-comment/{id}', name: 'app_trick_add_comment', methods: ['POST'])]
-    public function postComment(Trick $trick, Request $request, EntityManagerInterface $entityManager)
-    {
     }
 }

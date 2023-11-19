@@ -1,224 +1,260 @@
 {% extends 'base.html.twig' %}
 
 {% block javascripts %}
-    {{ parent() }}
-    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 {% endblock %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    <link href="https://vjs.zencdn.net/8.5.2/video-js.css" rel="stylesheet" />
-    {% set image =  trick.images|first %}
-    {% if image != false and image_exists(asset(image.name)) %}
-        {% set image = asset('/uploads/images/'~ image.name) %}
-    {% else %}
-        {% set image = asset('/uploads/images/default.jpg') %}
-    {% endif %}
-    <style>
-        .swiper {
-            width: 100%;
-          }
-          .bg-header {
-            background: linear-gradient(rgba(0, 0, 0, .5), rgba(0, 0, 0, .5)), url("{{ image }}");
-            background-repeat: no-repeat, no-repeat, no-repeat;
-            background-size: cover, cover, cover;
-            background-position: left top, left top, left top;
-            width: 100%;
-            height: 40vh;
-          }
-          body {
-            font-family: 'Roboto', sans-serif;
-          }
-          #card-container {
-            display: flex;
-            flex-wrap: wrap;
-          }
-          .card {
-            height: 55vh;
-            width: calc((100% / 3) - 16px);
-            margin: 8px;
-            border-radius: 3px;
-            transition: all 200ms ease-in-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          .card:hover {
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-          }
-          .card-actions {
-            margin: 8px;
-            padding: 16px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          }
-          #load-more {
-            width: calc((100% / 3) - 8px);
-            padding: 16px;
-            background-color: white;
-            border: none;
-            cursor: pointer;
-            transition: all 200ms ease-in-out;
-            border-radius: 3px;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15rem;
-          }
-          #load-more:not([disabled]):hover {
-            box-shadow: 0 1px 9px rgba(0, 0, 0, 0.2);
-          }
-          #load-more[disabled] {
-            background-color: #eaeaea !important;
-          }
-    </style>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
+{{ parent() }}
+<link href="https://vjs.zencdn.net/8.5.2/video-js.css" rel="stylesheet" />
+{% set image = null %}
+{% if trick.primaryImage != false and image_exists(asset(trick.primaryImage.name)) %}
+{% set image = asset('/uploads/images/'~ trick.primaryImage.name) %}
+{% else %}
+{% set image = asset('/uploads/images/default.jpg') %}
+{% endif %}
+<style>
+  .swiper {
+    width: 100%;
+  }
+
+  .bg-header {
+    background: linear-gradient(rgba(0, 0, 0, .5), rgba(0, 0, 0, .5)),
+    url("{{ image }}");
+    background-repeat: no-repeat, no-repeat, no-repeat;
+    background-size: cover, cover, cover;
+    background-position: left top, left top, left top;
+    width: 100%;
+    height: 40vh;
+  }
+
+  body {
+    font-family: 'Roboto', sans-serif;
+  }
+
+  #card-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .card {
+    height: 55vh;
+    width: calc((100% / 3) - 16px);
+    margin: 8px;
+    border-radius: 3px;
+    transition: all 200ms ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-actions {
+    margin: 8px;
+    padding: 16px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #load-more {
+    width: calc((100% / 3) - 8px);
+    padding: 16px;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 200ms ease-in-out;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15rem;
+  }
+
+  #load-more:not([disabled]):hover {
+    box-shadow: 0 1px 9px rgba(0, 0, 0, 0.2);
+  }
+
+  #load-more[disabled] {
+    background-color: #eaeaea !important;
+  }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
 {% endblock %}
 
 
 {% block title %}{{ trick.name|capitalize }} | SnowTricks{% endblock %}
 
 {% block body %}
-<section class="py-5 mx-0 text-center container d-flex align-items-center justify-content-center mx-auto bg-header">
-    <div class="row py-lg-5">
-        <div class="col mx-auto">
-            <h1 class="text-light text-center">{{ trick.name|capitalize }}</h1>
-        </div>
+<section class="py-5 mx-0 position-relative text-center container d-flex align-items-center justify-content-center mx-auto bg-header">
+  <div class="row py-lg-5 ">
+    <div class="col mx-auto">
+      <h1 class="text-light text-center">{{ trick.name|capitalize }}</h1>
     </div>
+  </div>
+  {% if app.user == trick.author %}
+      <div class="align-self-start position-absolute" style="top: 20px; right: 20px">
+          <a href="{{ path('app_trick_edit', {'id': trick.id}) }}" class="btn btn-sm btn-success">
+              <i class="fa fa-edit"></i>
+          </a>
+          {{ include('trick/_delete_form.html.twig') }}
+      </div>
+    {% endif %}
 </section>
 <section class="text-center container d-flex align-items-center justify-content-center mx-auto my-5 d-none d-md-block">
-    <div class="swiper">
-        <!-- Additional required wrapper -->
-        <div class="swiper-wrapper">
-          <!-- Slides -->
-          {% for image in trick.images %}
-            <div class="swiper-slide">
-              <img src="{{ asset('/uploads/images/'~ image.name) }}" alt="" width="300" height="315">
-            </div>
-          {% endfor %}
-          {% for video in trick.videos %}
-              <div class="swiper-slide">
-                <iframe width="300" height="315" src="{{ video.link }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-              </div>
-          {% endfor %}
+  <div class="swiper">
+    <!-- Additional required wrapper -->
+    <div class="swiper-wrapper">
+      <!-- Slides -->
+      {% for image in trick.images %}
+        <div class="swiper-slide">
+          <img src="{{ asset('/uploads/images/'~ image.name) }}" alt="" width="300" height="315">
         </div>
-      
-        <!-- If we need navigation buttons -->
-        <div class="swiper-button-prev"></div>
-        <div class="swiper-button-next"></div>
-      
-        <!-- If we need scrollbar -->
-    </div>
-</section>
-<section class="py-5 mx-0 container mx-auto text-center d-md-none">
-    <button class="btn btn-primary collapsed mb-5 btn-collapse" type="button" data-bs-toggle="collapse" onclick="toggleText()" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-        Voir les medias
-    </button>
-    <div class="collapse" id="collapseExample">
-        <div class="swiper">
-          <!-- Additional required wrapper -->
-          <div class="swiper-wrapper">
-            <!-- Slides -->
-            {% for image in trick.images %}
-              <div class="swiper-slide">
-                <img src="{{ asset('/uploads/images/'~ image.name) }}" alt="">
-              </div>
-              
-            {% endfor %}
-          </div>
-        
-          <!-- If we need navigation buttons -->
-          <div class="swiper-button-prev"></div>
-          <div class="swiper-button-next"></div>
-        
-          <!-- If we need scrollbar -->
-        </div>
-    </div>
-</section>
-<section class="pb-3 mx-0 container mx-auto">
-    <div class="trick-description">
-        <p class="fs-4">{{ trick.description }}</p>
-      </div>
-      <div class="row trick-info text-center">
-        <div class="col-sm-12 col-md-3 my-2 my-md-0 mx-md-3 btn btn-info">
-            {{ trick.createdAt|date("d/m/Y H:i:s") }}
-        </div>
-        <div class="col-sm-12 col-md-3 my-2 my-md-0 mx-md-3 btn btn-info">
-            {{ trick.category }}
-        </div>
-        {% if trick.createdAt != trick.updatedAt %}
-            <div class="col-sm-12 col-md-3 my-2 my-md-0 mx-md-3 btn btn-info">
-                {{ trick.updatedAt|date("d/m/Y H:i:s") }}
-            </div>
-        {% endif %}
-      </div>
-      <hr>
-</section>
-<section class="pb-3 mx-0 container mx-auto">
-    <div class="alert">
-      {% for type, messages in app.flashes %}
-        <div class="alert alert-{{ type }}" role="alert">
-          {% for message in messages %}
-            {{ message}} <br>
-          {% endfor %}
+      {% endfor %}
+      {% for video in trick.videos %}
+        <div class="swiper-slide">
+          <iframe width="300" height="315" src="{{ video.link }}" title="YouTube video player" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen></iframe>
         </div>
       {% endfor %}
     </div>
-    {{ form(form) }}
-    <hr>
+
+    <!-- If we need navigation buttons -->
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+
+    <!-- If we need scrollbar -->
+  </div>
+</section>
+<section class="py-5 mx-0 container mx-auto text-center d-md-none">
+  <button class="btn btn-primary collapsed mb-5 btn-collapse" type="button" data-bs-toggle="collapse"
+    onclick="toggleText()" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    Voir les medias
+  </button>
+  <div class="collapse" id="collapseExample">
+    <div class="swiper">
+      <!-- Additional required wrapper -->
+      <div class="swiper-wrapper">
+        <!-- Slides -->
+        {% for image in trick.images %}
+        <div class="swiper-slide">
+          <img src="{{ asset('/uploads/images/'~ image.name) }}" alt="" width="300" height="315">
+        </div>
+        {% endfor %}
+        {% for video in trick.videos %}
+        <div class="swiper-slide">
+          <iframe width="300" height="315" src="{{ video.link }}" title="YouTube video player" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen></iframe>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- If we need navigation buttons -->
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+
+      <!-- If we need scrollbar -->
+    </div>
+  </div>
+</section>
+<section class="pb-3 mx-0 container mx-auto">
+  <div class="trick-description">
+    <p class="fs-4">{{ trick.description }}</p>
+  </div>
+  <div class="row trick-info text-center">
+    <div class="col-sm-12 col-md-3 my-2 my-md-0 mx-md-3 btn btn-info">
+      {{ trick.createdAt|date("d/m/Y H:i:s") }}
+    </div>
+    <div class="col-sm-12 col-md-3 my-2 my-md-0 mx-md-3 btn btn-info">
+      {{ trick.category }}
+    </div>
+    {% if trick.createdAt != trick.updatedAt %}
+    <div class="col-sm-12 col-md-3 my-2 my-md-0 mx-md-3 btn btn-info">
+      {{ trick.updatedAt|date("d/m/Y H:i:s") }}
+    </div>
+    {% endif %}
+  </div>
+  <hr>
+</section>
+<section class="pb-3 mx-0 container mx-auto">
+  <div class="alert">
+    {% for type, messages in app.flashes %}
+    <div class="alert alert-{{ type }}" role="alert">
+      {% for message in messages %}
+      {{ message}} <br>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+  {{ form(form) }}
+  <hr>
 </section>
 <section class="py-5 mx-0 container mx-auto">
-    {{ include('comment/_list.html.twig') }}
+  {{ include('comment/_list.html.twig') }}
 </section>
 {% endblock %}
 
 {% block body_js %}
 {{ parent() }}
-  <script src="https://vjs.zencdn.net/8.5.2/video.min.js"></script>
-  <script>
-    function toggleText() {
-        elem = document.querySelector('.btn-collapse')
-        if (elem.innerText === "Voir les medias") {
-          elem.innerText = "Cacher les medias";
-        } else {
-          elem.innerText = "Voir les medias";
-        }
-      }
-      const swiper = new Swiper('.swiper', {
-          // Optional parameters
-          direction: 'horizontal',
-          loop: true,
+<script>
+  function toggleText() {
+    elem = document.querySelector('.btn-collapse')
+    if (elem.innerText === "Voir les medias") {
+      elem.innerText = "Cacher les medias";
+    } else {
+      elem.innerText = "Voir les medias";
+    }
+  }
 
-          // If we need pagination
-          pagination: {
-            el: '.swiper-pagination',
-          },
-        
-          // Navigation arrows
-          navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-          },
+  function calculateSlidePerView(totalOfMedias) {
+    return totalOfMedias < 3 ? totalOfMedias : 3;
+  }
 
-        // Responsive breakpoints
-          breakpoints: {
-            320: {
-                slidesPerView: 1,
-                spaceBetween: 20
-            },
-            480: {
-                slidesPerView: 1,
-                spaceBetween: 30
-            },
-            700: {
-                slidesPerView: 1,
-                spaceBetween: 40
-            },
-            1000: {
-                slidesPerView: 1,
-                spaceBetween: 50
-            },
-          }
-        });
-  </script>
+  const totalOfMedias = parseInt('{{ trick.videos|length }}') + parseInt('{{ trick.images|length }}')
+  const swiper = new Swiper('.swiper', {
+    // Optional parameters
+    direction: 'horizontal',
+    loop: true,
+    //centerInsufficientSlides: true,
+    // If we need pagination
+    pagination: {
+      el: '.swiper-pagination',
+    },
+
+    // Navigation arrows
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+
+    // Responsive breakpoints
+    breakpoints: {
+      320: {
+        slidesPerView: 1,
+        slidesPerGroup: 1,
+        spaceBetween: 200
+      },
+      480: {
+        slidesPerView: 2,
+        slidesPerGroup: 1,
+        spaceBetween: 300
+      },
+      700: {
+        slidesPerView: calculateSlidePerView(totalOfMedias),
+        slidesPerGroup: 1,
+        spaceBetween: 400
+      },
+      1000: {
+        slidesPerView: calculateSlidePerView(totalOfMedias),
+        slidesPerGroup: 1,
+        spaceBetween: 200
+      },
+    }
+  });
+</script>
 {% endblock %}

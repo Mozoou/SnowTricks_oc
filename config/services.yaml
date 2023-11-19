@@ -26,3 +26,6 @@ services:
     App\Service\ImageUploader:
         arguments:
             $imageDirectory: '%image_directory%'
+    App\Form\DataTransformer\StringToFileTransformer:
+        arguments:
+            $imageDirectory: '%image_directory%'

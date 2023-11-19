@@ -1,36 +1,74 @@
-{{ form_start(form) }}
+{% block stylesheets %}
+  {% set image = null %}
+  {% if trick.primaryImage != false and image_exists(asset(trick.primaryImage.name)) %}
+      {% set image = asset('/uploads/images/'~ trick.primaryImage.name) %}
+  {% else %}
+      {% set image = asset('/uploads/images/default.jpg') %}
+  {% endif %}
+  <style>
+    .bg-header {
+      background: linear-gradient(rgba(0, 0, 0, .5), rgba(0, 0, 0, .5)), url("{{ image }}");
+      background-repeat: no-repeat, no-repeat, no-repeat;
+      background-size: cover, cover, cover;
+      background-position: left top, left top, left top;
+      width: 100%;
+      height: 40vh;
+    }
+  </style>
+{% endblock %}
+    <section class="py-5 mx-0 position-relative text-center container d-flex align-items-center justify-content-center mx-auto bg-header">
+      <div class="row py-lg-5 ">
+        <div class="col mx-auto">
+          <h1 class="text-light text-center">{{ trick.name|capitalize }}</h1>
+        </div>
+      </div>
+      {% if app.user == trick.author %}
+          <div class="align-self-start position-absolute" style="top: 20px; right: 20px">
+              {{ include('trick/_delete_form.html.twig') }}
+          </div>
+        {% endif %}
+    </section>
+    {{ form_start(form) }}
+    {{ form_row(form.name) }}
+
     {{ form_row(form.primary_image) }}
 
-    <a class="add_item_link btn btn-success m-3" data-collection-holder-class="medias"><i class="fa-solid fa-plus"></i>Ajouter une image</a>
-    <a class="add_item_link btn btn-success m-3" data-collection-holder-class="medias"><i class="fa-solid fa-plus"></i>Ajouter une vidéo</a>
-
     <div class="my-3">
-      <div class="medias row row-cols-1 row-cols-md-3 g-4"
-      data-index="{{ form.images|length > 0 ? form.images|last.vars.name + 1 : 0 }}"
-      data-prototype="{{ form_widget(form.images.vars.prototype)|e('html_attr') }}">
-        {% for image in form.images %}
-          <div class="card mx-2">{{ form_widget(image) }}</div>
-        {% endfor %}
-        {% for video in form.videos %}
-          <div class="card my-2">{{ form_widget(video) }}</div>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <div class="my-3">
-      <ul class="videos list-group"
-      data-index="{{ form.videos|length > 0 ? form.videos|last.vars.name + 1 : 0 }}"
-      data-prototype="{{ form_widget(form.videos.vars.prototype)|e('html_attr') }}">
-        
-      </ul>
+      <div>
+        <h3><i class="fa-regular fa-images me-2"></i>Images</h3>
+        <a class="add_item_link btn btn-warning m-3" data-collection-holder-class="image"><i class="fa-solid fa-plus me-2"></i>Ajouter une image</a>
+        <div class="row row-cols-1 row-cols-md-3 g-2 image p-3"
+        data-index="{{ form.images|length > 0 ? form.images|last.vars.name + 1 : 0 }}"
+        data-prototype="{{ form_widget(form.images.vars.prototype)|e('html_attr') }}">
+          {% for key, image in trick.images %}
+            <div class="col card d-block position-relative">
+              <a class="btn btn-danger position-absolute old-image" style="top: -5px; right:0" data-id="{{ trick.images[key].id }}">
+                <i class="fa-solid fa-trash"></i>
+              </a>
+              <img class="card-img-top img-fluid" src="{{ asset('/uploads/images/'~ trick.images[key].name) }}" alt="{{ trick.name }}">
+            </div>
+          {% endfor %}
+        </div>
+        <h3><i class="fa-brands fa-youtube me-2"></i>Vidéos</h3>
+        <a class="add_item_link btn btn-warning m-3" data-collection-holder-class="video"><i class="fa-solid fa-plus me-2"></i>Ajouter une vidéo</a>
+        <div class="row row-cols-1 row-cols-md-3 g-2 video p-3"
+        data-index="{{ form.videos|length > 0 ? form.videos|last.vars.name + 1 : 0 }}"
+        data-prototype="{{ form_widget(form.videos.vars.prototype)|e('html_attr') }}">
+          {% for key, video in trick.videos %}
+            <div class="col card d-block position-relative p-3">
+              <iframe height="315" src="{{ trick.videos[key].link }}" title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen></iframe>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
     </div>
 
     {{ form_row(form.category) }}
-    {{ form_row(form.name) }}
     {{ form_row(form.description) }}
 
-      
-    <div class="d-grid gap-2 mt-5">
+    <div class="d-grid gap-2 my-5">
         <button class="btn btn-primary">{{ button_label|default('Ajouter') }}</button>
     </div>
     {{ form_row(form._token) }}
@@ -38,17 +76,19 @@
 {{ form_end(form, { render_rest: false }) }}
 
 {% block body_js %}
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
     const addTagFormDeleteLink = (item) => {
       const removeFormButton = document.createElement('a');
-      removeFormButton.classList.add('btn', 'btn-danger')
+      removeFormButton.classList.add('btn', 'btn-danger', 'position-absolute')
+      removeFormButton.style.top = '-5px'
+      removeFormButton.style.right = '0'
       removeFormButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
 
       item.append(removeFormButton);
 
       removeFormButton.addEventListener('click', (e) => {
           e.preventDefault();
-          // remove the li for the tag form
           item.remove();
       });
     }
@@ -56,7 +96,7 @@
       const collectionHolder = document.querySelector('.' + e.currentTarget.dataset.collectionHolderClass);
     
       const item = document.createElement('div');
-      item.classList.add('col', 'border', 'p-4')
+      item.classList.add('col', 'card', 'd-block', 'position-relative', 'p-3')
     
       item.innerHTML = collectionHolder
         .dataset
@@ -78,9 +118,28 @@
       btn.addEventListener("click", addFormToCollection)
     });
     document
-    .querySelectorAll('div.medias li')
+    .querySelectorAll('div.video div')
     .forEach((tag) => {
         addTagFormDeleteLink(tag)
     })
+
+    let imagesToDelete = document.querySelectorAll('.old-image')
+    imagesToDelete.forEach(imageToDelete => {
+      imageToDelete.addEventListener('click', (e) => {
+        let item = imageToDelete.parentElement;
+        deleteImage(imageToDelete.dataset.id, item)
+      })
+    })
+
+    function deleteImage(imageId, item) {
+      axios.get('/trick/delete/image/'+imageId)
+      .then(function (response) {
+        item.remove();
+      })
+      .catch(function (error) {
+        // Handle errors
+        console.error('Error:', error);
+      });
+    }
   </script>
 {% endblock %}

@@ -19,6 +19,8 @@ class Image
     #[ORM\ManyToOne(inversedBy: 'images')]
     private ?Trick $trick = null;
 
+    private bool $deleted = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,6 +46,18 @@ class Image
     public function setTrick(?Trick $trick): static
     {
         $this->trick = $trick;
+
+        return $this;
+    }
+
+    public function getDeleted(): bool
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(bool $deleted): self
+    {
+        $this->deleted = $deleted;
 
         return $this;
     }

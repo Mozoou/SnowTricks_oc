@@ -3,11 +3,11 @@
 {% block title %}Nouvelle figure | SnowTricks{% endblock %}
 
 {% block body %}
-<div class="my-3 ms-2 ms-md-5">
-    <a href="{{ path('app_home') }}" class="link-primary"><i class="fa-solid fa-circle-chevron-left fa-2xl me-3"></i>Retour</a>
-</div>
+    <div class="my-3 ms-2 ms-md-5">
+        <a href="{{ path('app_home') }}" class="link-primary"><i class="fa-solid fa-circle-chevron-left fa-2xl me-3"></i>Retour</a>
+    </div>
     <div class="container">
-        <h1 class="text-center mb-4">Ajout d'une nouvelle figure</h1>
+        <h1 class="text-center mb-4 bg-warning py-3">Ajout d'une nouvelle figure</h1>
         {{ include('trick/_form.html.twig') }}
     </div>
 {% endblock %}
