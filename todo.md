@@ -31,13 +31,13 @@
 - [ ] Faire un boutton pour remonter en haut de page
 
 ### Login
-- [ ] Faire le style (idem wireframe)
-- [ ] Ajouter lien "mot de passe oublié"
+- [x] Faire le style (idem wireframe)
+- [x] Ajouter lien "mot de passe oublié"
 
 ### Register
-- [ ] Faire le style (idem wireframe)
-- [ ] Ajouter un lien vers le login 'déja un compte ?'
+- [x] Faire le style (idem wireframe)
+- [x] Ajouter un lien vers le login 'déja un compte ?'
 
 ### Reset password
-- [ ] Faire le reset password (https://symfony.com/doc/5.2/security/reset_password.html)
-- [ ] Faire le style (idem wireframe)
+- [x] Faire le reset password (https://symfony.com/doc/5.2/security/reset_password.html)
+- [x] Faire le style (idem wireframe)

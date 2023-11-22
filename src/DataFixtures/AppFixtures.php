@@ -21,7 +21,7 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $admin = new User;
+        $admin = new User();
         $admin->setEmail('admin@example.com');
         $admin->setUsername('Administrateur');
         $hashedPassword = $this->userPasswordHasherInterface->hashPassword(
@@ -33,7 +33,7 @@ class AppFixtures extends Fixture
 
         $users = [];
         for ($i = 0; $i < 4; $i++) {
-            $user = new User;
+            $user = new User();
             $user->setEmail('user' . $i . '@example.com');
             $user->setUsername('User' . $i);
             $hashedPassword = $this->userPasswordHasherInterface->hashPassword(
@@ -60,7 +60,7 @@ class AppFixtures extends Fixture
 
         $categories = [];
         for ($i = 0; $i < 3; $i++) {
-            $categorie = new Category;
+            $categorie = new Category();
             $categorie->setName('Categorie ' . $i);
             $categories[] = $categorie;
 
@@ -68,7 +68,7 @@ class AppFixtures extends Fixture
         }
 
         foreach ($tricks as $name => $description) {
-            $trick = new Trick;
+            $trick = new Trick();
             $trick->setName($name);
             $trick->setSlug($this->slugGenerator->generateSlug($name));
             $trick->setDescription($description);
@@ -77,7 +77,7 @@ class AppFixtures extends Fixture
             $trick->setUpdatedAt(new \DateTimeImmutable());
             $trick->setAuthor($users[rand(0, 3)]);
 
-            $image = new Image;
+            $image = new Image();
             $image->setName('default.jpg');
             $manager->persist($image);
 

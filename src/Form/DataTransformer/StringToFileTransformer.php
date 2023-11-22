@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\File\File;
 
 class StringToFileTransformer implements DataTransformerInterface
 {
-
     public function __construct(
         private string $imageDirectory,
         private EntityManagerInterface $em,
@@ -20,7 +19,7 @@ class StringToFileTransformer implements DataTransformerInterface
      * Transforms an string (imageName) to a Symfony\Component\HttpFoundation\File\File
      *
      * @param  string|null $imageName
-     * 
+     *
      * @throws TransformationFailedException
      * @return null|File
      */
@@ -42,14 +41,14 @@ class StringToFileTransformer implements DataTransformerInterface
                     $imageName
                 )
             );
-        }        
+        }
     }
 
     /**
      * Return the file as it is
      *
      * @param  File $file
-     * 
+     *
      * @return File
      */
     public function reverseTransform($file): File

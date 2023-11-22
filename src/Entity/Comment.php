@@ -12,8 +12,8 @@ use Doctrine\ORM\Mapping\PrePersist;
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
 {
-    public final const STATUS_PENDING = "en attente";
-    public final const STATUS_VALID = "validé";
+    final public const STATUS_PENDING = "en attente";
+    final public const STATUS_VALID = "validé";
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

@@ -50,7 +50,7 @@ class TrickController extends AbstractController
 
             $videoNames = $form->get('videos')->getData();
             foreach ($videoNames as $videoName) {
-                $video = new Video;
+                $video = new Video();
                 $video->setLink($videoName);
                 $trick->addVideo($video);
                 $entityManager->persist($video);
@@ -131,7 +131,7 @@ class TrickController extends AbstractController
 
             $videoNames = $form->get('videos')->getData();
             foreach ($videoNames as $videoName) {
-                $video = new Video;
+                $video = new Video();
                 $video->setLink($videoName);
                 $trick->addVideo($video);
                 $entityManager->persist($video);
@@ -165,7 +165,7 @@ class TrickController extends AbstractController
         return $this->json([
              'success' => true,
         ]);
-                    
+
     }
 
     #[Route('/delete/{id}', name: 'app_trick_delete', methods: ['POST'])]
