@@ -129,14 +129,6 @@ class TrickController extends AbstractController
                 $entityManager->persist($image);
             }
 
-            $videoNames = $form->get('videos')->getData();
-            foreach ($videoNames as $videoName) {
-                $video = new Video();
-                $video->setLink($videoName);
-                $trick->addVideo($video);
-                $entityManager->persist($video);
-            }
-
             $entityManager->flush();
             $this->addFlash('success', sprintf(
                 'La figure %s a bien été modifiée',
